@@ -4,6 +4,7 @@ import React from "react";
 import * as models from "../models";
 import { EntityRelationFieldsChart } from "./EntityRelationFieldsChart";
 import "./RelatedEntityFieldField.scss";
+import { useRouteMatch } from "react-router-dom";
 
 const CLASS_NAME = "related-entity-field-field";
 
@@ -12,8 +13,12 @@ type Props = {
 };
 
 const RelatedEntityFieldField = ({ entityDisplayName }: Props) => {
+  const match = useRouteMatch<{
+    application: string;
+    entity: string;
+    field: string;
+  }>("/:application/entities/:entity/fields/:field");
   const formik = useFormikContext<models.EntityField>();
-
   const { data } = useQuery<{ entity: models.Entity }>(
     GET_ENTITY_FIELD_BY_PERMANENT_ID,
     {
@@ -23,6 +28,8 @@ const RelatedEntityFieldField = ({ entityDisplayName }: Props) => {
       },
     }
   );
+
+  const { entity } = match?.params ?? {};
 
   const relatedField =
     data &&
@@ -37,7 +44,7 @@ const RelatedEntityFieldField = ({ entityDisplayName }: Props) => {
         <EntityRelationFieldsChart
           fixInPlace={false}
           applicationId={data.entity.appId}
-          entityId={data.entity.id}
+          entityId={entity}
           field={formik.values}
           entityName={entityDisplayName}
           relatedField={relatedField}
